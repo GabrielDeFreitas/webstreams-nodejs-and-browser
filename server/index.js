@@ -2,6 +2,7 @@ import { createServer } from 'node:http'
 import { createReadStream } from 'node:fs'
 import { Readable, Transform } from 'node:stream'
 import { WritableStream, TransformStream } from 'node:stream/web'
+import { setTimeout } from 'node:timers/promises'
 import csvtojson from 'csvtojson'
 
 const PORT = 3000
@@ -19,11 +20,26 @@ createServer(async(request, response) => {
   }
 
   let items = 0
+  request.once('close', () => console.log('connection was closed!', items))
 
   Readable.toWeb(createReadStream('./animeflv.csv'))
   .pipeThrough(Transform.toWeb(csvtojson()))
+  .pipeThrough(new TransformStream ({
+    transform(chunk, controller) {
+      //console.log('chunk', Buffer.from(chunk).toString())
+      const data = JSON.parse(Buffer.from(chunk))
+      const mappedData = {
+        title: data.title,
+        description: data.description,
+        url_anime: data.url_anime
+      }
+      controller.enqueue (JSON.stringify(mappedData).concat('\n')
+      )
+    }
+  }))
   .pipeTo(new WritableStream ({
-    write(chunk) {
+    async write(chunk) {
+      await setTimeout(1000)
       items++
       response.write(chunk)
     },
