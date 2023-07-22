@@ -1,3 +1,10 @@
+## Webstreams-nodejs-and-browser
+
+Webstreams, best way to process terabytes of data on demand and without crashing.
+
+This project is a practical example where the back-end will use webstreams to read the csv files.
+Convert each individual line to json and gradually respond to http requests.
+
 ## Database
 
 [List of anime from 1990 to 2022](https://www.kaggle.com/datasets/danielalbarracinm/list-of-anime-from-1990-to-2022?resource=download)
